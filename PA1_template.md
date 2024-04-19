@@ -77,7 +77,7 @@ StepsPerDay_activity <- activity %>%
       summarise(total_sum = sum(steps, na.rm = TRUE))
 
 # Plot the histogram of the total number of steps per day
-hist(StepsPerDay_activity$total_sum, main = "Steps per day", xlab = "Steps", 
+hist(StepsPerDay_activity$total_sum, main = "Histogram of the total number of steps per day", xlab = "Total number of steps", 
      ylab = "Frequency", col = "lightsalmon", breaks=10)
 ```
 
@@ -200,9 +200,9 @@ StepsPerDay_activity_filledNA <- activity_filledNA %>%
 
 # Plot the histogram of the total number of steps per day
 par(mfrow = c(1, 2))
-hist(StepsPerDay_activity_filledNA$total_sum, main = "Steps per day \n(without NAs)", xlab = "Steps", 
+hist(StepsPerDay_activity_filledNA$total_sum, main = "Histogram of the total \nsteps per day \n(without NAs)", xlab = "Total number of steps", 
      ylab = "Frequency", col = "skyblue", breaks=10)
-hist(StepsPerDay_activity$total_sum, main = "Steps per day \n(with NAs)", xlab = "Steps", 
+hist(StepsPerDay_activity$total_sum, main = "Histogram of the total \nsteps per day \n(with NAs)", xlab = "Total number of steps", 
      ylab = "Frequency", col = "lightsalmon", breaks=10)
 ```
 
