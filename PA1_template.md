@@ -9,11 +9,12 @@ In this assignment, data collected from a personal activity monitoring device wa
 
 The packages used for this assignment are loaded below.
 
-````{r loadingpackages, echo=TRUE, message = FALSE}
+
+```r
 library(dplyr)
 library(ggplot2)
 library(lubridate)
-````
+```
 
 ## Loading and preprocessing the data
 
@@ -25,8 +26,8 @@ First, the data needs to be loaded using the given url link in the assignement. 
 
 - `date` : char variable which gives the day of the recording in format `YYYY-mm-dd`.
 
-````{r loading, echo=TRUE}
 
+```r
 # Load the data from the url if the data folder does not already exist in the correct folder
 data_folder_name <- "repdata_data_activity.zip"
 file_data_unzip <- "activity.csv"
@@ -41,7 +42,7 @@ if (!file.exists(data_folder_name)) {
 if (!file.exists(file_data_unzip)) {
       unzip(data_folder_name)
 }
-````
+```
 
 Before analyzing the data in more details, some preprocessing actions are performed by creating new columns:
 
@@ -49,7 +50,8 @@ Before analyzing the data in more details, some preprocessing actions are perfor
 
 - Finally, a second column `total_minutes` is added. It is an integer variable that gives the total minutes of time that has passed until this data point, on that particular day. 
 
-````{r preprocessing, echo=TRUE}
+
+```r
 activity <- read.csv("activity.csv")
 
 # Convert the date column into POSIXct
@@ -57,7 +59,7 @@ activity$date_time <- strptime(paste(as.POSIXct(activity$date, format = "%Y-%m-%
                                      sprintf("%04d", activity$interval)), 
                                  format = "%Y-%m-%d %H%M")
 activity$total_minutes <- hour(activity$date_time)*60 + minute(activity$date_time)
-````
+```
 
 ## What is mean total number of steps taken per day?
 
@@ -65,7 +67,8 @@ A first analysis is done by studying the total number of steps per day. For this
 
 Below, the histogram showcases the distribution of the total number of steps per day. From the plot, one sees that most days, between 10000 and 12000 total steps are done by the subject.
 
-````{r totalsteps, echo=TRUE, fig.width=5, fig.height=4}
+
+```r
 # Calculate the total number of steps per day
 StepsPerDay_activity <- activity %>% 
       filter(!is.na(steps)) %>%
@@ -75,19 +78,27 @@ StepsPerDay_activity <- activity %>%
 # Plot the histogram of the total number of steps per day
 hist(StepsPerDay_activity$total_sum, main = "Steps per day", xlab = "Steps", 
      ylab = "Frequency", col = "lightsalmon", breaks=10)
-````
+```
+
+![](PA1_template_files/figure-html/totalsteps-1.png)<!-- -->
 
 In addition to the histogram, the mean and median of the total steps per day can be directly calculated.
 
-````{r meansteps, echo=TRUE}
+
+```r
 # Calculate the mean and median steps per day
 MeanStepsDay <- mean(StepsPerDay_activity$total_sum, na.rm = TRUE)
 MedianStepsDay <- median(StepsPerDay_activity$total_sum, na.rm = TRUE)
 
 cat("The mean total steps per day is equal to", round(MeanStepsDay, 2), "\nThe median is equal to", MedianStepsDay)
-````
+```
 
-The mean total steps per day is equal to `r format(MeanStepsDay, scientific=FALSE)`, while the median is equal to `r MedianStepsDay`.
+```
+## The mean total steps per day is equal to 10766.19 
+## The median is equal to 10765
+```
+
+The mean total steps per day is equal to 10766.19, while the median is equal to 10765.
 
 ## What is the average daily activity pattern?
 
@@ -95,7 +106,8 @@ In this section, we want to get the average daily activity pattern of the subjec
 
 The subsequent average daily activity pattern is shown in the following time series graphic. From the plot, we observe that the average number of steps is close to 0 at the beginning of the day (0:00, 5:00), as well as its end (after 23:00), which probably corresponds to periods of time were the subject is sleeping. In particular, there seems to be a peak of activity between 8:00 and 9:00. 
 
-````{r averagedailyactivity, echo=TRUE, fig.width=10, fig.height=4}
+
+```r
 # Calculate the mean number of steps per 5 min interval
 StepPerInterval_activity <- activity %>% 
       filter(!is.na(steps)) %>%
@@ -110,11 +122,14 @@ plot(x = StepPerInterval_activity$total_minutes/60,
      xlab = "Time (hour)",
      ylab = "Average steps",
      xlim = c(0,24))
-````
+```
+
+![](PA1_template_files/figure-html/averagedailyactivity-1.png)<!-- -->
 
 The exact time interval where the number of steps is, in average, the highest, is calculated below.
 
-````{r meaninterval, echo=TRUE}
+
+```r
 # Find the 5-min interval with the highest number of steps
 MaxStepInterval <- max(StepPerInterval_activity$mean, na.rm = TRUE)
 MaxInterval_TotalMinutes <- StepPerInterval_activity$total_minutes[which.max(StepPerInterval_activity$mean)]
@@ -124,16 +139,20 @@ MaxInterval_hour <- MaxInterval_TotalMinutes %/% 60
 MaxInterval_minute <- MaxInterval_TotalMinutes %% 60
 
 cat("The peak activity is situated at the interval", MaxInterval_hour, MaxInterval_minute, "and is equal to", round(MaxStepInterval, 2), "steps")
+```
 
-````
+```
+## The peak activity is situated at the interval 8 35 and is equal to 206.17 steps
+```
 
-The peak of activity is situated at the time mark `MaxInterval_TotalMinutes` = `r MaxInterval_TotalMinutes` minutes, which, when converted into `HH:MM` format, corresponds to `r MaxInterval_hour`:`r MaxInterval_minute`, i.e. the interval identifier is 835. This is probably correlated with the time at which the subject is going to work.
+The peak of activity is situated at the time mark `MaxInterval_TotalMinutes` = 515 minutes, which, when converted into `HH:MM` format, corresponds to 8:35, i.e. the interval identifier is 835. This is probably correlated with the time at which the subject is going to work.
 
 ## Imputing missing values
 
 In the previous sections, the NAs were ignored. Here, a strategy will be devised to fill in the missing values. First, we start to check the total number of NAs:
 
-````{r sumNA, echo=TRUE}
+
+```r
 # Get the total number of NA values
 TotalNA <- sum(is.na(activity))
 
@@ -141,16 +160,21 @@ TotalNA <- sum(is.na(activity))
 NAsteps <- sum(is.na(activity$steps))
 
 cat("Total number of missing values:", TotalNA, "\nNumber of missing values in the steps column:", NAsteps)
+```
 
-````
+```
+## Total number of missing values: 2304 
+## Number of missing values in the steps column: 2304
+```
 
-There are a total of `TotalNA` = `NAsteps` = `r NAsteps` values missing in the dataframe, all of them present in the `steps` column.
+There are a total of `TotalNA` = `NAsteps` = 2304 values missing in the dataframe, all of them present in the `steps` column.
 
 To fill the NA values, the following strategy will be employed: The missing values will be replaced by the mean values calculated for each 5-minute interval across all days. In my opinion, it is a better representation of the number of steps made in that particular 5-min interval than using the mean/median of that particular day. For example, if the interval is situated at the beginning of the day, the person is sleeping and the number of steps will therefore be close to 0. In addition, some days of the dataset have NAs for the whole day, making the mean/median value per day strategy difficult to apply.
 
 After filling in the NAs, the histogram of the total number of steps per day is plotted in blue. For a better comparison, the previous histogram, where the NAs were ignored, is also displayed in red.
 
-````{r fillingNA, echo=TRUE, fig.width=10, fig.height=5}
+
+```r
 # Fill the NA values present in the steps column in a new dataframe
 activity_filledNA <- activity %>%
       group_by(total_minutes) %>%
@@ -161,7 +185,13 @@ activity_filledNA <- activity %>%
 TotalNA_new <- sum(is.na(activity_filledNA))
 
 cat("Total number of missing values in the new dataframe is:", TotalNA_new)
+```
 
+```
+## Total number of missing values in the new dataframe is: 0
+```
+
+```r
 # Calculate the total number of steps per day
 StepsPerDay_activity_filledNA <- activity_filledNA %>% 
       group_by(date) %>% 
@@ -173,19 +203,27 @@ hist(StepsPerDay_activity_filledNA$total_sum, main = "Steps per day \n(without N
      ylab = "Frequency", col = "skyblue", breaks=10)
 hist(StepsPerDay_activity$total_sum, main = "Steps per day \n(with NAs)", xlab = "Steps", 
      ylab = "Frequency", col = "lightsalmon", breaks=10)
-````
+```
+
+![](PA1_template_files/figure-html/fillingNA-1.png)<!-- -->
 
 The bin which had already the highest frequency with the NAs (red) increased in the new histogram (blue), while the other bins stayed at the same height. This is expected, since we used the mean value to replace the NAs, therefore we see an increase in frequency of the bin containing the mean value too.
 
-````{r meaninterval_withNA, echo=TRUE}
+
+```r
 # Calculate the mean and median steps per day
 MeanStepsDay_filledNA <- mean(StepsPerDay_activity_filledNA$total_sum)
 MedianStepsDay_filledNA <- median(StepsPerDay_activity_filledNA$total_sum)
 
 cat("The mean total steps per day is equal to", MeanStepsDay_filledNA, "\nThe median is equal to", MedianStepsDay_filledNA)
-````
+```
 
-After filling the NAs, the mean total steps per day value is equal to `r format(MeanStepsDay_filledNA, scientific=FALSE)`, the same as previously (since we used the mean to fill in the missing values). As for the new median value, equal to `r format(MedianStepsDay_filledNA, scientific=FALSE)`, it is almost the same to the previous median value, and is now equal to the mean.
+```
+## The mean total steps per day is equal to 10766.19 
+## The median is equal to 10766.19
+```
+
+After filling the NAs, the mean total steps per day value is equal to 10766.19, the same as previously (since we used the mean to fill in the missing values). As for the new median value, equal to 10766.19, it is almost the same to the previous median value, and is now equal to the mean.
 
 Using the mean value of steps for a particular 5-min interval to deal with NAs values will naturally skew the results towards the mean value of total steps. 
 
@@ -193,19 +231,21 @@ Using the mean value of steps for a particular 5-min interval to deal with NAs v
 
 In this final part of the work, we will again plot the average daily activity pattern, but this time we will distinguish between weekdays and weekends. To achieve this, a new factor variable is added as the column `day_type` to the `activity_filledNA` dataframe. The variable takes either the value `weekend` if the current day is a Saturday or Sunday, or the value `weekday` for every other day of the week.
 
-````{r typeday, echo=TRUE, message = FALSE}
+
+```r
 # Create a new column day_type which takes value "weekend" or "weekday", depending
 # on the day type of the date
 activity_filledNA <- activity_filledNA %>%
       mutate(day_type = ifelse(weekdays(date_time) == "Saturday" |
                    weekdays(date_time) == "Sunday", "weekend", "weekday"))
-````
+```
 
 Similarly to before, we then calculate the average number of steps for each interval, but this time by separating the weekdays from the weekends. The dataframe is therefore grouped by `total_times` but also by `day_type`. A time series plot is done for each case below, to visualize the average daily activity pattern per day type. 
 
 Comparing the curves between each other, it is possible to observe some differences between the patterns. Indeed, during weekdays, the activity clearly starts around 5:30, while on weekends it starts around 8:00, showing that the subject generally sleeps longer on weekends. In addition, there is a great peak of activity at 8:30 which then slows during the afternoon for weekdays. For weekends, the peak of activity at 8:30 is smaller, but the global activity during the afternoon seems to be slightly higher. The subject does maybe more various activities during weekends (jogging, walk) than during weekdays, where the person will be occupied by work, maybe sitting in an office.
 
-````{r plotweekday, echo=TRUE, fig.width=10, fig.height=5, message=FALSE}
+
+```r
 # Calculate the average steps per 5 minute interval depending on the day type
 StepPerInterval_activity_filledNA <- activity_filledNA %>% 
       group_by(total_minutes, day_type) %>% 
@@ -221,4 +261,6 @@ ggplot(StepPerInterval_activity_filledNA, aes(x = total_minutes/60, y = mean)) +
            y = "Average steps") +
       theme(plot.title = element_text(hjust = 0.5))+
       coord_cartesian(xlim = c(0, 24))
-````
+```
+
+![](PA1_template_files/figure-html/plotweekday-1.png)<!-- -->
