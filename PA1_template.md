@@ -208,7 +208,7 @@ hist(StepsPerDay_activity$total_sum, main = "Steps per day \n(with NAs)", xlab =
 
 ![](PA1_template_files/figure-html/fillingNA-1.png)<!-- -->
 
-The bin which had already the highest frequency with the NAs (red) increased in the new histogram (blue), while the other bins stayed at the same height. This is expected, since we used the mean value to replace the NAs, therefore we see an increase in frequency of the bin containing the mean value too.
+The bin which had already the highest frequency with the NAs (orange) increased in the new histogram (blue), while the other bins stayed at the same height. This is expected, since we used the mean value to replace the NAs, therefore we see an increase in frequency of the bin containing the mean value too.
 
 
 ```r
